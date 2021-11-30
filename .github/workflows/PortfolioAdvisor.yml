@@ -1,0 +1,112 @@
+name: PortfolioAdvisor
+
+on: #DO NOT CHANGE
+  workflow_dispatch: #DO NOT CHANGE
+    #https://levelup.gitconnected.com/how-to-manually-trigger-a-github-actions-workflow-4712542f1960
+   inputs:
+      git-ref:
+        description: SHA (Leave Blank)
+        required: false
+        #  push:
+        #      branches: [ master , main ]
+        #      paths:
+        #      - "CheckList.md" # It all hinges on you updating this file properly!
+  push:
+    branches: [ master , main ]
+    paths:
+    - ".Ossonts/Trigger.md" #
+
+jobs:
+  #markdown-link-check:
+  #  runs-on: [self-hosted, linux, x64]
+  #  steps:
+  #  - uses: actions/checkout@master
+  #  - uses: gaurav-nelson/github-action-markdown-link-check@v1
+  PortfolioAdvisor:
+    #runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux, x64,L1]
+    #container: ossonts/setap:latest # Beware of versioning here DOCKERHUB
+    container:
+       image: ghcr.io/setap2021/setapdocker   # Beware of versioning here GITHUB -- Some kind of magic here
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #runs-on: [self-hosted, linux, x64]
+    steps:
+    #- uses: actions/checkout@v2
+    - name: Clone Student Repository (Latest)
+      uses: actions/checkout@v2
+      # with:
+      #   fetch-depth: 0
+      if: github.event.inputs.git-ref == ''
+    - name: Clone Student Repository (Custom Ref)
+      uses: actions/checkout@v2
+      if: github.event.inputs.git-ref != '' # todo fix issue here at some point
+      with:
+        ref: ${{ github.event.inputs.git-ref }}
+        #fetch-depth: 0
+
+    - name: Clone Advisor
+      uses: actions/checkout@v2                            # 2
+      with:
+        repository: setap2021/Portfolio4-Marker # CHANGE HERE
+        token: ${{ secrets.PAT_RO }}              # 4
+        path: .Ossonts/
+        ref: 'main'
+
+    - name: Run the Portfolio Advisor
+      uses: ./.Ossonts/
+
+    - name: Clone Student Repository (FEEDBACK)
+      uses: actions/checkout@v2
+      with:
+        clean: 'False'
+        ref: "feedback" # Branch
+        path: 'FEEDBACK'
+
+    - name: Moving Advisor files
+      run: |
+        tree
+        cp -v .Ossonts/Advisor* FEEDBACK/.Ossonts/
+        tree  FEEDBACK/.Ossonts/
+      shell: bash
+
+      # Commit auto generated files
+    - uses: EndBug/add-and-commit@v7
+      with:
+        message: "Portfolio Advisor logs"
+        author_name: "OssontsBOT"
+        cwd: 'FEEDBACK'
+        branch: feedback
+        #add: ".Ossonts/*.log .Ossonts/*.md --force"
+        add: ".Ossonts/Advisor* --force"
+        #tag: 'Submit --force'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name : Adding Helper files
+    #   uses: EndBug/add-and-commit@v4
+    #   with:
+    #     message: "Logger"
+    #     add: ".Ossonts/*.log .Ossonts/*.md"
+    #     force: true
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # uses: github-actions-x/commit@v2.6
+      # with:
+      #   github-token: ${{ secrets.GITHUB_TOKEN }}
+      #   rebase: 'true'
+      #   #push-branch: 'feedback' # does not quite work yet
+      #   commit-message: 'Helper files from portfolio checker'
+      #   force-add: 'true'
+      #   files: .Ossonts/*.log .Ossonts/*.md
+      #   name: OssontsBOT
+        #email: my.github@email.com
+
+    # - name: markdownlint-cli
+    #   run: markdownlint *.md
+
+    # - name: Files
+    #   run: pwd && ls -al
+
+    # - name: Portfolio3 Checker
+    #   run: .Ossonts/Portfolio3.sh

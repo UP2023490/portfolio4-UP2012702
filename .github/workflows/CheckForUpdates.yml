@@ -1,0 +1,77 @@
+name: CheckForUpdates
+
+on: #DO NOT CHANGE
+    #workflow_dispatch: #DO NOT CHANGE
+    #https://levelup.gitconnected.com/how-to-manually-trigger-a-github-actions-workflow-4712542f1960
+  #workflow_dispatch:
+   push:
+     #branches: [ master , main ]
+     paths:
+     - ".Ossonts/Update.md" #
+
+jobs:
+  #markdown-link-check:
+  #  runs-on: [self-hosted, linux, x64]
+  #  steps:
+  #  - uses: actions/checkout@master
+  #  - uses: gaurav-nelson/github-action-markdown-link-check@v1
+  CheckForUpdates:
+    #runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux, x64,L1]
+    #container: ossonts/setap:latest # Beware of versioning here DOCKERHUB
+    container:
+       image: ghcr.io/setap2021/setapdocker   # Beware of versioning here GITHUB -- Some kind of magic here
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #runs-on: [self-hosted, linux, x64]
+    steps:
+    #- uses: actions/checkout@v2
+
+
+    - name: Clone Template Repo
+      uses: actions/checkout@v2                            # 2
+      with:
+        repository: SETAP2021/Portfolio4-Template ##get template  --CHANGE HERE
+        token: ${{ secrets.PAT_RO }}              # 4
+        path: Template
+
+    - name: Clone Student Repository (Latest)
+      uses: actions/checkout@v2
+      with:
+        path: Student
+
+
+    - name: Remove Protected files from template
+      run: |
+        cd Template/
+        chmod +x .Ossonts/RemoveReservedFiles.sh
+        .Ossonts/RemoveReservedFiles.sh
+      shell: bash
+
+    - name: Overlay updated files (if any)
+      run: |
+        Template/.Ossonts/CopyTemplateFilesToRepo.sh
+        tree Template/
+        tree Student/
+        # echo "Template folder"
+        # git -C Template  status
+        echo "Student folder"
+        git -C Student status
+
+      shell: bash
+
+      # Commit any updated files
+    - uses: EndBug/add-and-commit@v7
+      with:
+        message: "Assessment UPDATE"
+        #author_name: "UpdaterBOT"
+        cwd: 'Student/'
+        #pull: 'NO-PULL'
+        #path:
+        #branch: Feedback
+        #add: ".Ossonts/* .github/* .github/workflows/* --force"
+        #add: "**"
+        #add: "* --force"
+        #tag: 'Submit --force'
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_RO }}

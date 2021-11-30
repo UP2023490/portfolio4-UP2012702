@@ -1,0 +1,16 @@
+{
+    "ignorePatterns": [
+        {
+          "pattern": "^https://github.com/SETAP2021/SETAP/blob/main/Coursework/IndividualPortfolio.md"
+
+        },
+        {
+            "pattern": "^https://github.com/SETAP2021/SETAP/*"
+
+          }
+          {
+            "pattern": "^../*/badge.svg"
+
+          }
+      ]
+}

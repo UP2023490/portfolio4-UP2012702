@@ -1,0 +1,38 @@
+name: MarkdownChecker
+
+on:
+  #DO NOT CHANGE
+  workflow_dispatch:
+  #push:
+    #branches: [ master , main ]
+    #paths:
+    #- ".Ossonts/Trigger.md" #
+
+jobs:
+  markdown-link-check:
+    #runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux, x64,L2]
+    container:
+      image: ghcr.io/setap2021/setapdocker   # Beware of versioning here GITHUB -- Some kind of magic here
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - uses: actions/checkout@master
+    - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        config-file: ".Ossonts/mlc.json"
+  markdownlint-cli:
+    #runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux, x64,L2]
+    container:
+      image: ghcr.io/setap2021/setapdocker   # Beware of versioning here GITHUB -- Some kind of magic here
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - uses: actions/checkout@master
+    - name: markdownlint-cli
+      uses: nosborn/github-action-markdown-cli@v1.1.1
+      with:
+        files: "**/*.md"
+        ignore_files: "README.md"
+        config_file: ".markdownlint.yaml"

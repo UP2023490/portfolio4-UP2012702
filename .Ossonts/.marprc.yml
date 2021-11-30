@@ -1,0 +1,18 @@
+# .marprc.yml
+allowLocalFiles: true
+options:
+  looseYAML: false
+  markdown:
+    breaks: false
+#html: true
+pdf: true
+inputDir: ../Slides/
+output: ../build/
+
+#from: gfm # no size images
+#from: markdown #okay but not kramdown {width...}
+#from: markdown_phpextra
+#from: markdown_mmd
+#from: commonmark_x # error
+#from: commonmark -- no table
+#from: markdown_github - no param

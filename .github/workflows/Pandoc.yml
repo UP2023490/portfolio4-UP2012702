@@ -1,0 +1,67 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Pandoc
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+
+on: #DO NOT CHANGE
+  workflow_dispatch: #DO NOT CHANGE
+
+  #https://levelup.gitconnected.com/how-to-manually-trigger-a-github-actions-workflow-4712542f1960
+    inputs:
+      git-ref:
+        description: SHA (Leave Blank)
+        required: false
+  # push:
+  #   branches: [ master , main ]
+  #   paths:
+  #   - "CheckList.md" # It all hinges on you updating this file properly!
+  push:
+    branches: [ master , main ]
+    paths:
+    - ".Ossonts/Trigger.md" #
+
+jobs:
+  #markdown-link-check:
+  #  runs-on: [self-hosted, linux, x64]
+  #  steps:
+  #  - uses: actions/checkout@master
+  #  - uses: gaurav-nelson/github-action-markdown-link-check@v1
+  PandocGenerator:
+    #runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux, x64,L2]
+    #container: ossonts/setap:latest # Beware of versioning here DOCKERHUB
+    container: ghcr.io/setap2021/setapdocker   # Beware of versioning here GITHUB -- Some kind of magic here
+    #runs-on: [self-hosted, linux, x64]
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Make Submit folder if needed
+        run: |
+           mkdir -p Submit
+
+      - name: Find .md files
+        run: |
+          pwd
+          echo "Files and order:"
+          cat .pandoc.yml
+          tree
+          cat  .Ossonts/pandoc.yml
+
+      - name: Make PDF
+        run: |
+          pandoc --defaults=.pandoc.yml --defaults=.Ossonts/pandoc.yml
+
+                # Commit auto generated files
+      - uses: EndBug/add-and-commit@v7
+        with:
+          message: "Pandoc PDF"
+          author_name: "OssontsBOT"
+          #branch: feedback
+          add:  "Submit/*.pdf"
+          #tag: 'Submit --force'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

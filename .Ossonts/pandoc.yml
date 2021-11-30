@@ -1,0 +1,21 @@
+#https://pandoc.org/MANUAL.html#default-files
+# --from=gfm --to=latex --variable=documentclass=report  --variable=geometry:a4paper
+# --variable=geometry:margin=2cm  --variable=linkcolor:blue --pdf-engine=xelatex  ${{ env.FILELIST }} --output=build/Portfolio.pdf
+
+to: latex
+
+include-in-header: .Ossonts/latexHeader.tex
+variables:
+  documentclass: article # report #
+  geometry: a4paper,margin=2cm
+  #,landscape
+  linkcolor: blue
+  #mainfont: "DejaVu Serif"
+  #monofont: "DejaVu Sans Mono"
+  #  classoption:
+  #    - landscape
+  #pdf-engine: pdflatex
+  #classoption:
+  #  - landscape
+  # set up bib?
+  #https://yihui.org/knitr/demo/pandoc/
