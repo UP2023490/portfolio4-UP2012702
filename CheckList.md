@@ -6,8 +6,8 @@
 <!-- Beware if you use some Markdown editors, do not change the '*' to a '-' -->
 
 <!--==============  START:   Edit the Markdown below here  ================  -->
-* [ ] Part 1
-* [ ] Part 2
+* [X] Part 1
+* [X] Part 2
 * [ ] Part 3
 * [ ] Part 4
 * [ ] Part 5
