@@ -18,9 +18,10 @@ resource-path:
 # Order is important
 input-files:
 #  You will want to remove the README file
-- README.md
+
 # Files relating to the assessment
 - Portfolio.md
 #You will want to KEEP the checklist file here
 - CheckList.md
 #add your student id file below here
+- Student.id
